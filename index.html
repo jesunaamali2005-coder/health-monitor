@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Health Monitoring System</title>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #f4f6f8;
+      text-align: center;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      margin: auto;
+      max-width: 350px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .normal { color: green; font-weight: bold; }
+    .alert { color: red; font-weight: bold; }
+  </style>
+</head>
+
+<body>
+
+<h2>Smart Health Monitor</h2>
+
+<div class="card">
+  <p>Temperature</p>
+  <h1 id="temp">-- °C</h1>
+
+  <p>Status</p>
+  <h2 id="status">--</h2>
+
+  <p>Last Update</p>
+  <p id="time">--</p>
+</div>
+
+<script>
+  // 🔹 Replace with your Firebase config
+  var firebaseConfig = {
+    apiKey: "AIzaSyCq4-w3QU9AWdu97W3moKyih6ANCN0mFxE",
+    authDomain: "health-monitor-58970.firebaseapp.com",
+    databaseURL: "https://health-monitor-58970-default-rtdb.firebaseio.com",
+    projectId: "health-monitor-58970"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  var db = firebase.database();
+
+  db.ref("patient").on("value", function(snapshot) {
+    var data = snapshot.val();
+    if (!data) return;
+
+    document.getElementById("temp").innerHTML = data.temperature + " °C";
+    document.getElementById("time").innerHTML = data.timestamp;
+
+    if (data.status == 1) {
+      document.getElementById("status").innerHTML = "NORMAL";
+      document.getElementById("status").className = "normal";
+    } else {
+      document.getElementById("status").innerHTML = "ALERT";
+      document.getElementById("status").className = "alert";
+    }
+  });
+</script>
+
+</body>
+</html>
