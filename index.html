@@ -1,49 +1,54 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Health Monitoring System</title>
+  <title>Smart Health Monitor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- Firebase SDK -->
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
   <style>
     body {
       font-family: Arial;
-      background: #f4f6f8;
-      text-align: center;
-      padding: 20px;
+      background: #f2f2f2;
+      margin: 0;
+      padding: 10px;
     }
-    .card {
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+    }
+    .patient {
       background: white;
-      padding: 20px;
-      margin: auto;
-      max-width: 350px;
+      padding: 15px;
+      margin: 10px 0;
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    .normal { color: green; font-weight: bold; }
-    .alert { color: red; font-weight: bold; }
+    .alert {
+      background: #ffdddd;
+      border-left: 6px solid red;
+    }
+    .normal {
+      background: #ddffdd;
+      border-left: 6px solid green;
+    }
   </style>
 </head>
 
 <body>
 
-<h2>Smart Health Monitor</h2>
+<h1>Smart Health Monitor</h1>
 
-<div class="card">
-  <p>Temperature</p>
-  <h1 id="temp">-- °C</h1>
+<div id="patients"></div>
 
-  <p>Status</p>
-  <h2 id="status">--</h2>
-
-  <p>Last Update</p>
-  <p id="time">--</p>
-</div>
+<audio id="alarm">
+  <source src="https://www.soundjay.com/buttons/sounds/beep-07.mp3" type="audio/mpeg">
+</audio>
 
 <script>
-  // 🔹 Replace with your Firebase config
+  // 🔴 REPLACE WITH YOUR FIREBASE DETAILS
   var firebaseConfig = {
     apiKey: "AIzaSyCq4-w3QU9AWdu97W3moKyih6ANCN0mFxE",
     authDomain: "health-monitor-58970.firebaseapp.com",
@@ -54,19 +59,38 @@
   firebase.initializeApp(firebaseConfig);
   var db = firebase.database();
 
-  db.ref("patient").on("value", function(snapshot) {
-    var data = snapshot.val();
-    if (!data) return;
+  const patientsDiv = document.getElementById("patients");
+  const alarm = document.getElementById("alarm");
 
-    document.getElementById("temp").innerHTML = data.temperature + " °C";
-    document.getElementById("time").innerHTML = data.timestamp;
+  db.ref("patients").on("value", function(snapshot) {
+    patientsDiv.innerHTML = "";
+    let alertActive = false;
 
-    if (data.status == 1) {
-      document.getElementById("status").innerHTML = "NORMAL";
-      document.getElementById("status").className = "normal";
-    } else {
-      document.getElementById("status").innerHTML = "ALERT";
-      document.getElementById("status").className = "alert";
+    snapshot.forEach(function(child) {
+      const data = child.val();
+      const temp = data.temperature;
+      const status = data.status;
+      const time = data.timestamp || "--";
+
+      let div = document.createElement("div");
+      div.className = "patient " + (status == 0 || temp >= 38 ? "alert" : "normal");
+
+      if (temp >= 38 || status == 0) {
+        alertActive = true;
+      }
+
+      div.innerHTML = `
+        <h3>${child.key}</h3>
+        <p><b>Temperature:</b> ${temp} °C</p>
+        <p><b>Status:</b> ${temp >= 38 ? "ALERT" : "NORMAL"}</p>
+        <p><b>Time:</b> ${time}</p>
+      `;
+
+      patientsDiv.appendChild(div);
+    });
+
+    if (alertActive) {
+      alarm.play();
     }
   });
 </script>
