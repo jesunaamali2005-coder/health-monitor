@@ -1,99 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Smart Health Monitor</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <!-- Firebase -->
+  <title>Patient Monitor</title>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
-  <style>
-    body {
-      font-family: Arial;
-      background: #f2f2f2;
-      margin: 0;
-      padding: 10px;
-    }
-    h1 {
-      text-align: center;
-      color: #2c3e50;
-    }
-    .patient {
-      background: white;
-      padding: 15px;
-      margin: 10px 0;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    .alert {
-      background: #ffdddd;
-      border-left: 6px solid red;
-    }
-    .normal {
-      background: #ddffdd;
-      border-left: 6px solid green;
-    }
-  </style>
 </head>
-
 <body>
-
-<h1>Smart Health Monitor</h1>
-
-<div id="patients"></div>
-
-<audio id="alarm">
-  <source src="https://www.soundjay.com/buttons/sounds/beep-07.mp3" type="audio/mpeg">
-</audio>
+  <h1>Patient Live Data</h1>
+  <h2 id="temp"></h2>
+  <h2 id="status"></h2>
 
 <script>
-  // 🔴 REPLACE WITH YOUR FIREBASE DETAILS
   var firebaseConfig = {
     apiKey: "AIzaSyCq4-w3QU9AWdu97W3moKyih6ANCN0mFxE",
-    authDomain: "health-monitor-58970.firebaseapp.com",
-    databaseURL: "https://health-monitor-58970-default-rtdb.firebaseio.com",
-    projectId: "health-monitor-58970"
+    databaseURL: "https://health-monitor-58970-default-rtdb.firebaseio.com"
   };
-
   firebase.initializeApp(firebaseConfig);
-  var db = firebase.database();
 
-  const patientsDiv = document.getElementById("patients");
-  const alarm = document.getElementById("alarm");
-
-  db.ref("patients").on("value", function(snapshot) {
-    patientsDiv.innerHTML = "";
-    let alertActive = false;
-
-    snapshot.forEach(function(child) {
-      const data = child.val();
-      const temp = data.temperature;
-      const status = data.status;
-      const time = data.timestamp || "--";
-
-      let div = document.createElement("div");
-      div.className = "patient " + (status == 0 || temp >= 38 ? "alert" : "normal");
-
-      if (temp >= 38 || status == 0) {
-        alertActive = true;
-      }
-
-      div.innerHTML = `
-        <h3>${child.key}</h3>
-        <p><b>Temperature:</b> ${temp} °C</p>
-        <p><b>Status:</b> ${temp >= 38 ? "ALERT" : "NORMAL"}</p>
-        <p><b>Time:</b> ${time}</p>
-      `;
-
-      patientsDiv.appendChild(div);
-    });
-
-    if (alertActive) {
-      alarm.play();
-    }
+  firebase.database().ref("patient").on("value", snap => {
+    document.getElementById("temp").innerText =
+      "Temperature: " + snap.val().temperature + " °C";
+    document.getElementById("status").innerText =
+      "Status: " + snap.val().status;
   });
 </script>
-
 </body>
 </html>
