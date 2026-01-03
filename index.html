@@ -18,5 +18,18 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 <script src="app.js"></script>
+  <p><a href="#" onclick="resetPassword()">Forgot Password?</a></p>
+
+<script>
+function resetPassword() {
+    const email = prompt("Enter your email for password reset:");
+    if (email) {
+        firebase.auth().sendPasswordResetEmail(email)
+        .then(() => alert("Password reset email sent!"))
+        .catch((error) => alert(error.message));
+    }
+}
+</script>
+
 </body>
 </html>
