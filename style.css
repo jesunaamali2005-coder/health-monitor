@@ -1,0 +1,42 @@
+body {
+  font-family: Arial;
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  color: white;
+  text-align: center;
+}
+
+.login-body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.login-box {
+  background: #ffffff;
+  color: #000;
+  padding: 30px;
+  border-radius: 10px;
+  width: 300px;
+}
+
+.login-box input {
+  width: 90%;
+  padding: 10px;
+  margin: 10px 0;
+}
+
+button {
+  padding: 10px 20px;
+  background: #ff4757;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+.card {
+  background: rgba(0,0,0,0.4);
+  padding: 20px;
+  margin: 20px;
+  border-radius: 10px;
+}
