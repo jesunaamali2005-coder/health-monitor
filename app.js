@@ -1,5 +1,5 @@
-// FIREBASE CONFIG
-const firebaseConfig = {
+// 🔹 FIREBASE CONFIG (PUT YOUR REAL VALUES)
+var firebaseConfig = {
   apiKey: "AIzaSyCq4-w3QU9AWdu97W3moKyih6ANCN0mFxE",
   authDomain: "health-monitor-58970.firebaseapp.com",
   databaseURL: "https://health-monitor-58970-default-rtdb.firebaseio.com",
@@ -10,66 +10,65 @@ const firebaseConfig = {
   measurementId: "G-P2ZDW69QXQ"
 };
 
+// 🔹 INIT FIREBASE
 firebase.initializeApp(firebaseConfig);
 
-// LOGIN
+// ================= LOGIN =================
 function login() {
-  const email = document.getElementById("email").value;
-  const pass = document.getElementById("password").value;
+  var email = document.getElementById("email").value;
+  var pass = document.getElementById("password").value;
 
   firebase.auth().signInWithEmailAndPassword(email, pass)
-    .then(() => window.location.href = "dashboard.html")
-    .catch(e => document.getElementById("loginMsg").innerText = e.message);
+    .then(() => {
+      window.location.href = "dashboard.html";
+    })
+    .catch(error => {
+      document.getElementById("loginMsg").innerText = error.message;
+    });
 }
 
-// EMAILJS INIT
-emailjs.init("Eh_PvU_iJv8iVeyRW");
+// ================= DASHBOARD =================
+if (window.location.pathname.includes("dashboard")) {
 
-// DATABASE
-const db = firebase.database();
-const ref = db.ref("patient/1");
+  var db = firebase.database();
+  var ref = db.ref("patient/1");
 
-// CHART
-let ctx = document.getElementById("chart");
-let chart = new Chart(ctx, {
-  type: 'line',
-  data: {
-    labels: [],
-    datasets: [
-      { label: 'Heart Rate', data: [], borderWidth: 2 },
-      { label: 'SpO₂', data: [], borderWidth: 2 }
-    ]
-  }
-});
+  var hrSpan = document.getElementById("hr");
+  var spo2Span = document.getElementById("spo2");
+  var statusSpan = document.getElementById("status");
+  var alertSound = document.getElementById("alertSound");
 
-// LIVE DATA LISTENER
-ref.on("value", snap => {
-  let d = snap.val();
-  if (!d) return;
+  // CHART
+  var ctx = document.getElementById("chart").getContext("2d");
+  var chart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: [],
+      datasets: [
+        { label: "Heart Rate", data: [], borderColor: "red", fill: false },
+        { label: "SpO₂", data: [], borderColor: "lime", fill: false }
+      ]
+    }
+  });
 
-  document.getElementById("hr").innerText = d.heart_rate;
-  document.getElementById("spo2").innerText = d.spo2;
+  ref.on("value", snapshot => {
+    var d = snapshot.val();
+    if (!d) return;
 
-  chart.data.labels.push(new Date().toLocaleTimeString());
-  chart.data.datasets[0].data.push(d.heart_rate);
-  chart.data.datasets[1].data.push(d.spo2);
-  chart.update();
+    hrSpan.innerText = d.heart_rate;
+    spo2Span.innerText = d.spo2;
 
-  // AI RULE-BASED PREDICTION
-  let status = "NORMAL";
-  if (d.heart_rate < 50 || d.heart_rate > 120 || d.spo2 < 92) {
-    status = "CRITICAL";
-    document.getElementById("alertSound").play();
-    sendEmail(d);
-  }
-  document.getElementById("status").innerText = status;
-});
+    chart.data.labels.push(new Date().toLocaleTimeString());
+    chart.data.datasets[0].data.push(d.heart_rate);
+    chart.data.datasets[1].data.push(d.spo2);
+    chart.update();
 
-// EMAIL ALERT
-function sendEmail(data) {
-  emailjs.send("service_kbpknsu", "template_898oe0j", {
-    patient_id: "1",
-    heart_rate: data.heart_rate,
-    spo2: data.spo2
+    // SIMPLE AI LOGIC
+    var status = "NORMAL";
+    if (d.heart_rate < 50 || d.heart_rate > 120 || d.spo2 < 92) {
+      status = "CRITICAL";
+      alertSound.play();
+    }
+    statusSpan.innerText = status;
   });
 }
