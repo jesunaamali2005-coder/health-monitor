@@ -8,16 +8,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
-*{box-sizing:border-box}
 body{
   margin:0;
   font-family:'Poppins',sans-serif;
-  min-height:100vh;
   background:linear-gradient(135deg,#141e30,#243b55);
+  min-height:100vh;
   display:flex;
   align-items:center;
   justify-content:center;
-  color:#fff;
+  color:white;
 }
 .container{
   width:360px;
@@ -27,44 +26,35 @@ body{
   padding:25px;
   box-shadow:0 15px 40px rgba(0,0,0,0.4);
 }
-h2{text-align:center;margin-bottom:20px}
+h2{text-align:center}
 input{
   width:100%;
   padding:12px;
   margin:10px 0;
-  border-radius:8px;
   border:none;
-  outline:none;
+  border-radius:8px;
 }
 button{
   width:100%;
   padding:12px;
-  margin-top:10px;
   border:none;
   border-radius:8px;
   background:#00e5ff;
-  font-size:15px;
   font-weight:600;
   cursor:pointer;
 }
 button:hover{background:#00bcd4}
-.dashboard{display:none;text-align:center}
 .card{
   background:rgba(0,0,0,0.3);
   border-radius:12px;
   padding:15px;
   margin:12px 0;
-}
-.value{font-size:28px;font-weight:600}
-.normal{color:#00ff99}
-.alert{color:#ff5252}
-.logout{background:#ff5252;color:#fff}
-.footer{
-  margin-top:15px;
-  font-size:12px;
-  opacity:0.8;
   text-align:center;
 }
+.value{font-size:26px;font-weight:600}
+.normal{color:#00ff99}
+.alert{color:#ff5252}
+.logout{background:#ff5252;color:white}
 </style>
 </head>
 
@@ -72,8 +62,8 @@ button:hover{background:#00bcd4}
 
 <div class="container">
 
-<!-- LOGIN -->
-<div id="login">
+<!-- LOGIN PAGE -->
+<div id="loginPage">
   <h2>Patient Login</h2>
   <input type="email" id="email" placeholder="Email">
   <input type="password" id="password" placeholder="Password">
@@ -81,8 +71,8 @@ button:hover{background:#00bcd4}
 </div>
 
 <!-- DASHBOARD -->
-<div id="dashboard" class="dashboard">
-  <h2>Health Dashboard</h2>
+<div id="dashboard" style="display:none">
+  <h2>Live Health Data</h2>
 
   <div class="card">
     Temperature
@@ -95,8 +85,6 @@ button:hover{background:#00bcd4}
   </div>
 
   <button class="logout" onclick="logout()">Logout</button>
-
-  <div class="footer">Remote Patient Health Monitoring</div>
 </div>
 
 </div>
@@ -107,7 +95,7 @@ button:hover{background:#00bcd4}
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
 <script>
-/* 🔴 YOUR FIREBASE CONFIG */
+/* FIREBASE CONFIG */
 var firebaseConfig = {
   apiKey: "AIzaSyCq4-w3QU9AWdu97W3moKyih6ANCN0mFxE",
   authDomain: "health-monitor-58970.firebaseapp.com",
@@ -123,21 +111,23 @@ firebase.initializeApp(firebaseConfig);
 function login(){
   var email=document.getElementById("email").value;
   var password=document.getElementById("password").value;
+
   firebase.auth().signInWithEmailAndPassword(email,password)
   .then(()=>{
-    document.getElementById("login").style.display="none";
+    document.getElementById("loginPage").style.display="none";
     document.getElementById("dashboard").style.display="block";
-    loadData();
+    startLiveData();
   })
   .catch(err=>alert(err.message));
 }
 
-/* LOAD LIVE DATA */
-function loadData(){
-  firebase.database().ref("patient").on("value",snap=>{
+/* LIVE DATA */
+function startLiveData(){
+  firebase.database().ref("patient").on("value", snap=>{
     if(snap.exists()){
       let d=snap.val();
       document.getElementById("temp").innerText=d.temperature;
+
       if(d.status==1){
         document.getElementById("status").innerText="NORMAL";
         document.getElementById("status").className="value normal";
@@ -153,7 +143,7 @@ function loadData(){
 function logout(){
   firebase.auth().signOut();
   document.getElementById("dashboard").style.display="none";
-  document.getElementById("login").style.display="block";
+  document.getElementById("loginPage").style.display="block";
 }
 </script>
 
