@@ -1,175 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>AI Health Monitoring</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<style>
-body{
-  margin:0;
-  font-family:'Poppins',sans-serif;
-  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
-  min-height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  color:white;
-}
-.container{
-  width:400px;
-  background:rgba(255,255,255,0.12);
-  backdrop-filter:blur(12px);
-  padding:25px;
-  border-radius:16px;
-}
-h2{text-align:center}
-input,button{
-  width:100%;
-  padding:12px;
-  margin-top:10px;
-  border:none;
-  border-radius:8px;
-}
-button{background:#00e5ff;font-weight:600}
-.card{
-  background:rgba(0,0,0,0.3);
-  padding:15px;
-  border-radius:12px;
-  margin-top:12px;
-  text-align:center;
-}
-.value{font-size:26px;font-weight:600}
-.normal{color:#00ff99}
-.alert{color:#ff5252}
-canvas{margin-top:10px}
-</style>
+  <title>Smart Health Login</title>
+  <link rel="stylesheet" href="style.css">
 </head>
+<body class="login-body">
 
-<body>
-
-<div class="container">
-
-<div id="login">
-  <h2>Login</h2>
-  <input id="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Password">
+<div class="login-box">
+  <h2>Smart Health Monitoring</h2>
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Password">
   <button onclick="login()">Login</button>
+  <p id="loginMsg"></p>
 </div>
 
-<div id="dashboard" style="display:none">
-  <h2>AI Health Dashboard</h2>
-
-  <div class="card">
-    Heart Rate
-    <div class="value"><span id="hr">--</span> bpm</div>
-  </div>
-
-  <div class="card">
-    SpO₂
-    <div class="value"><span id="spo2">--</span> %</div>
-  </div>
-
-  <div class="card">
-    AI Prediction
-    <div class="value" id="prediction">--</div>
-  </div>
-
-  <canvas id="chart"></canvas>
-
-  <button onclick="logout()">Logout</button>
-</div>
-
-</div>
-
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
-<!-- EmailJS -->
-<script src="https://cdn.jsdelivr.net/npm/emailjs-com@2/dist/email.min.js"></script>
-
-<script>
-emailjs.init("YOUR_EMAILJS_PUBLIC_KEY");
-
-var firebaseConfig = {
-  apiKey: "AIzaSyCq4-w3QU9AWdu97W3moKyih6ANCN0mFxE",
-  authDomain: "health-monitor-58970.firebaseapp.com",
-  databaseURL: "https://health-monitor-58970-default-rtdb.firebaseio.com",
-  projectId: "health-monitor-58970",
-  storageBucket: "health-monitor-58970.firebasestorage.app",
-  messagingSenderId: "389520868404",
-  appId: "1:389520868404:web:e2e915837835454825f661",
-  measurementId: "G-P2ZDW69QXQ"
-};
-firebase.initializeApp(firebaseConfig);
-
-let labels=[], hrData=[];
-let chart;
-
-function login(){
-  firebase.auth().signInWithEmailAndPassword(email.value,password.value)
-  .then(()=>{
-    login.style.display="none";
-    dashboard.style.display="block";
-    startLive();
-  }).catch(e=>alert(e.message));
-}
-
-function startLive(){
-  initChart();
-  firebase.database().ref("patients/patient1").on("value",snap=>{
-    let d=snap.val();
-    hr.innerText=d.heartRate;
-    spo2.innerText=d.spo2;
-    aiPredict(d.heartRate,d.spo2);
-    updateChart(d.heartRate);
-  });
-}
-
-function aiPredict(hrVal,spo2Val){
-  let pred=document.getElementById("prediction");
-
-  if(hrVal<60 || hrVal>100 || spo2Val<94){
-    pred.innerText="CRITICAL";
-    pred.className="value alert";
-    sendEmail(hrVal,spo2Val);
-  }else{
-    pred.innerText="NORMAL";
-    pred.className="value normal";
-  }
-}
-
-function sendEmail(hr,spo2){
-  emailjs.send("service_kbpknsu","template_898oe0j",{
-    heart_rate: hr,
-    spo2: spo2
-  });
-}
-
-function initChart(){
-  chart=new Chart(document.getElementById("chart"),{
-    type:"line",
-    data:{labels:labels,datasets:[{label:"Heart Rate",data:hrData,borderColor:"#00e5ff"}]}
-  });
-}
-
-function updateChart(val){
-  if(labels.length>10){labels.shift();hrData.shift();}
-  labels.push(new Date().toLocaleTimeString());
-  hrData.push(val);
-  chart.update();
-}
-
-function logout(){
-  firebase.auth().signOut();
-  location.reload();
-}
-</script>
-
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
