@@ -29,6 +29,12 @@ function resetPassword() {
         .catch((error) => alert(error.message));
     }
 }
+  firebase.auth().onAuthStateChanged((user) => {
+    if (!user) {
+        // User is signed out, redirect to login
+        window.location = "index.html";
+    }
+});
 </script>
 
 </body>
