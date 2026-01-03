@@ -1,29 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Firebase App (required) -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<!-- Firebase Auth -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-<!-- Firebase Realtime Database -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-
-<script>
-  // Your Firebase configuration
-  var firebaseConfig = {
-    apiKey: "AIzaSyCq4-w3QU9AWdu97W3moKyih6ANCN0mFxE",
-  authDomain: "health-monitor-58970.firebaseapp.com",
-  databaseURL: "https://health-monitor-58970-default-rtdb.firebaseio.com",
-  projectId: "health-monitor-58970",
-  storageBucket: "health-monitor-58970.firebasestorage.app",
-  messagingSenderId: "389520868404",
-  appId: "1:389520868404:web:e2e915837835454825f661",
-  measurementId: "G-P2ZDW69QXQ"
-  };
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-</script>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Signup - Smart Health</title>
@@ -43,7 +20,23 @@ button { padding:10px 20px; background:#ff4b5c; color:#fff; border:none; cursor:
 <p id="message"></p>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
 <script>
+var firebaseConfig = {
+   apiKey: "AIzaSyCq4-w3QU9AWdu97W3moKyih6ANCN0mFxE",
+  authDomain: "health-monitor-58970.firebaseapp.com",
+  databaseURL: "https://health-monitor-58970-default-rtdb.firebaseio.com",
+  projectId: "health-monitor-58970",
+  storageBucket: "health-monitor-58970.firebasestorage.app",
+  messagingSenderId: "389520868404",
+  appId: "1:389520868404:web:e2e915837835454825f661",
+  measurementId: "G-P2ZDW69QXQ"
+};
+firebase.initializeApp(firebaseConfig);
+
 const signupBtn = document.getElementById('signupBtn');
 
 signupBtn.addEventListener('click', () => {
@@ -55,8 +48,7 @@ signupBtn.addEventListener('click', () => {
         const uid = userCredential.user.uid;
         // Save user in database
         firebase.database().ref('users/' + uid).set({
-            email: email,
-            role: "patient" // default role
+            email: email
         });
         document.getElementById('message').innerText = "Signup successful! Redirecting...";
         setTimeout(() => { window.location = "login.html"; }, 1500);
