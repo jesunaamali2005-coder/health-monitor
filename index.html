@@ -1,31 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Remote Patient Monitoring</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-    <div class="login-container" id="login">
-        <h2>Patient Login</h2>
-        <input type="email" id="email" placeholder="Email">
-        <input type="password" id="password" placeholder="Password">
-        <button onclick="login()">Login</button>
-        <p id="login-error"></p>
-    </div>
+  <title>Patient Monitoring Dashboard</title>
 
-    <div class="dashboard" id="dashboard" style="display:none;">
-        <h2>Patient Dashboard</h2>
-        <p>SpO₂: <span id="spo2">--</span>%</p>
-        <p>Status: <span id="status">--</span></p>
-        <canvas id="spo2Chart" width="400" height="200"></canvas>
-        <button onclick="logout()">Logout</button>
-        <audio id="alertSound" src="alert.mp3"></audio>
-    </div>
+  <!-- Firebase v8 -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <div class="card">
+    <h1>Patient Dashboard</h1>
+
+    <h2>SpO₂: <span id="spo2">--</span> %</h2>
+    <h2>Status: <span id="status">--</span></h2>
+
+    <canvas id="spo2Chart"></canvas>
+
+    <audio id="alertSound" src="alert.mp3"></audio>
+  </div>
 
 <script src="app.js"></script>
 </body>
