@@ -1,42 +1,37 @@
 body {
-  font-family: Arial;
-  background: linear-gradient(135deg, #1e3c72, #2a5298);
-  color: white;
-  text-align: center;
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #74ebd5, #ACB6E5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
-.login-body {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
+.login-container, .dashboard {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    text-align: center;
 }
 
-.login-box {
-  background: #ffffff;
-  color: #000;
-  padding: 30px;
-  border-radius: 10px;
-  width: 300px;
-}
-
-.login-box input {
-  width: 90%;
-  padding: 10px;
-  margin: 10px 0;
+input {
+    padding: 10px;
+    margin: 10px;
+    width: 250px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
 }
 
 button {
-  padding: 10px 20px;
-  background: #ff4757;
-  color: white;
-  border: none;
-  border-radius: 5px;
+    padding: 10px 20px;
+    background-color: #ff6b6b;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
 }
 
-.card {
-  background: rgba(0,0,0,0.4);
-  padding: 20px;
-  margin: 20px;
-  border-radius: 10px;
+button:hover {
+    background-color: #ff4757;
 }
