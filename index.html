@@ -1,40 +1,166 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Smart Health Login</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body class="login-body">
+<meta charset="UTF-8">
+<title>Remote Patient Monitoring</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<div class="login-box">
-  <h2>Smart Health Monitoring</h2>
-  <input type="email" id="email" placeholder="Email">
-  <input type="password" id="password" placeholder="Password">
-  <button onclick="login()">Login</button>
-  <p id="loginMsg"></p>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  color: white;
+}
+
+header {
+  text-align: center;
+  padding: 20px;
+  font-size: 26px;
+  font-weight: bold;
+}
+
+.container {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+}
+
+.card {
+  background: rgba(255,255,255,0.12);
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+h3 {
+  margin-top: 0;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: none;
+}
+
+.value {
+  font-size: 48px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.status {
+  font-size: 22px;
+  text-align: center;
+  margin-top: 10px;
+}
+
+canvas {
+  background: white;
+  border-radius: 10px;
+  padding: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+Remote Patient Monitoring Dashboard
+<p style="font-size:14px;opacity:0.8;">
+Live SpO₂ Monitoring | Biomedical Engineering Project
+</p>
+</header>
+
+<div class="container">
+
+<div class="card">
+  <h3>Patient Name</h3>
+  <input id="patientName" placeholder="Enter patient name">
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-<script src="app.js"></script>
-  <p><a href="#" onclick="resetPassword()">Forgot Password?</a></p>
+<div class="card">
+  <h3>SpO₂ Level</h3>
+  <div class="value" id="spo2Value">--%</div>
+  <div class="status" id="statusText">Waiting...</div>
+</div>
+
+<div class="card">
+  <h3>Live SpO₂ Chart</h3>
+  <canvas id="spo2Chart"></canvas>
+</div>
+
+</div>
+
+<audio id="alertSound" preload="auto">
+  <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg">
+</audio>
 
 <script>
-function resetPassword() {
-    const email = prompt("Enter your email for password reset:");
-    if (email) {
-        firebase.auth().sendPasswordResetEmail(email)
-        .then(() => alert("Password reset email sent!"))
-        .catch((error) => alert(error.message));
+let ctx = document.getElementById('spo2Chart').getContext('2d');
+
+let spo2Chart = new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: [],
+    datasets: [{
+      label: 'SpO₂ %',
+      data: [],
+      borderColor: 'red',
+      backgroundColor: 'rgba(255,0,0,0.1)',
+      tension: 0.4
+    }]
+  },
+  options: {
+    scales: {
+      y: {
+        min: 85,
+        max: 100
+      }
     }
-}
-  firebase.auth().onAuthStateChanged((user) => {
-    if (!user) {
-        // User is signed out, redirect to login
-        window.location = "index.html";
-    }
+  }
 });
+
+function generateSpO2() {
+  let spo2 = Math.floor(Math.random() * 4) + 95;
+  if (Math.random() < 0.15) {
+    spo2 = Math.floor(Math.random() * 5) + 88;
+  }
+  return spo2;
+}
+
+function updateData() {
+  let spo2 = generateSpO2();
+  let time = new Date().toLocaleTimeString();
+
+  document.getElementById("spo2Value").innerText = spo2 + "%";
+
+  if (spo2 < 95) {
+    document.getElementById("statusText").innerText = "CRITICAL";
+    document.getElementById("statusText").style.color = "red";
+    document.getElementById("alertSound").play();
+  } else {
+    document.getElementById("statusText").innerText = "NORMAL";
+    document.getElementById("statusText").style.color = "lightgreen";
+  }
+
+  spo2Chart.data.labels.push(time);
+  spo2Chart.data.datasets[0].data.push(spo2);
+
+  if (spo2Chart.data.labels.length > 10) {
+    spo2Chart.data.labels.shift();
+    spo2Chart.data.datasets[0].data.shift();
+  }
+
+  spo2Chart.update();
+}
+
+setInterval(updateData, 2000);
 </script>
 
 </body>
