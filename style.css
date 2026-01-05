@@ -1,37 +1,25 @@
 body {
-    font-family: 'Arial', sans-serif;
-    background: linear-gradient(135deg, #74ebd5, #ACB6E5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+  background: linear-gradient(135deg, #1d2671, #c33764);
+  font-family: Arial;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
 
-.login-container, .dashboard {
-    background: white;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    text-align: center;
+.card {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  width: 350px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
 }
 
-input {
-    padding: 10px;
-    margin: 10px;
-    width: 250px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
+h1 {
+  color: #c33764;
 }
 
-button {
-    padding: 10px 20px;
-    background-color: #ff6b6b;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #ff4757;
+h2 {
+  margin: 10px 0;
 }
