@@ -1,4 +1,4 @@
-// 🔹 FIREBASE CONFIG (PUT YOUR REAL VALUES)
+// 🔴 Firebase config
 var firebaseConfig = {
   apiKey: "AIzaSyCq4-w3QU9AWdu97W3moKyih6ANCN0mFxE",
   authDomain: "health-monitor-58970.firebaseapp.com",
@@ -9,66 +9,86 @@ var firebaseConfig = {
   appId: "1:389520868404:web:e2e915837835454825f661",
   measurementId: "G-P2ZDW69QXQ"
 };
-
-// 🔹 INIT FIREBASE
 firebase.initializeApp(firebaseConfig);
 
-// ================= LOGIN =================
-function login() {
-  var email = document.getElementById("email").value;
-  var pass = document.getElementById("password").value;
+// DOM Elements
+const loginDiv = document.getElementById("login");
+const dashboardDiv = document.getElementById("dashboard");
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const loginError = document.getElementById("login-error");
+const spo2El = document.getElementById("spo2");
+const statusEl = document.getElementById("status");
+const alertSound = document.getElementById("alertSound");
 
-  firebase.auth().signInWithEmailAndPassword(email, pass)
+// Chart setup
+let spo2ChartCtx = document.getElementById('spo2Chart').getContext('2d');
+let spo2Chart = new Chart(spo2ChartCtx, {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [{
+            label: 'SpO₂ (%)',
+            data: [],
+            borderColor: 'rgba(255, 99, 132, 1)',
+            fill: false
+        }]
+    },
+    options: {
+        responsive: true,
+        animation: false,
+        scales: {
+            x: { display: true },
+            y: { min: 80, max: 100 }
+        }
+    }
+});
+
+// Login function
+function login() {
+    const email = emailInput.value;
+    const password = passwordInput.value;
+    firebase.auth().signInWithEmailAndPassword(email, password)
     .then(() => {
-      window.location.href = "dashboard.html";
+        loginDiv.style.display = "none";
+        dashboardDiv.style.display = "block";
+        startRealtimeUpdates();
     })
-    .catch(error => {
-      document.getElementById("loginMsg").innerText = error.message;
+    .catch(err => {
+        loginError.textContent = err.message;
     });
 }
 
-// ================= DASHBOARD =================
-if (window.location.pathname.includes("dashboard")) {
+// Logout
+function logout() {
+    firebase.auth().signOut();
+    dashboardDiv.style.display = "none";
+    loginDiv.style.display = "block";
+}
 
-  var db = firebase.database();
-  var ref = db.ref("patient/1");
+// Realtime updates
+function startRealtimeUpdates() {
+    firebase.database().ref("patient").on("value", snapshot => {
+        const data = snapshot.val();
+        if (!data) return;
 
-  var hrSpan = document.getElementById("hr");
-  var spo2Span = document.getElementById("spo2");
-  var statusSpan = document.getElementById("status");
-  var alertSound = document.getElementById("alertSound");
+        const spo2 = data.spo2;
+        const status = data.status;
 
-  // CHART
-  var ctx = document.getElementById("chart").getContext("2d");
-  var chart = new Chart(ctx, {
-    type: "line",
-    data: {
-      labels: [],
-      datasets: [
-        { label: "Heart Rate", data: [], borderColor: "red", fill: false },
-        { label: "SpO₂", data: [], borderColor: "lime", fill: false }
-      ]
-    }
-  });
+        spo2El.textContent = spo2;
+        statusEl.textContent = status;
 
-  ref.on("value", snapshot => {
-    var d = snapshot.val();
-    if (!d) return;
+        // Play alert sound if critical
+        if (status === "CRITICAL") alertSound.play();
+        else alertSound.pause();
 
-    hrSpan.innerText = d.heart_rate;
-    spo2Span.innerText = d.spo2;
-
-    chart.data.labels.push(new Date().toLocaleTimeString());
-    chart.data.datasets[0].data.push(d.heart_rate);
-    chart.data.datasets[1].data.push(d.spo2);
-    chart.update();
-
-    // SIMPLE AI LOGIC
-    var status = "NORMAL";
-    if (d.heart_rate < 50 || d.heart_rate > 120 || d.spo2 < 92) {
-      status = "CRITICAL";
-      alertSound.play();
-    }
-    statusSpan.innerText = status;
-  });
+        // Update chart
+        if (spo2Chart.data.labels.length > 20) {
+            spo2Chart.data.labels.shift();
+            spo2Chart.data.datasets[0].data.shift();
+        }
+        spo2Chart.data.labels.push(new Date().toLocaleTimeString());
+        spo2Chart.data.datasets[0].data.push(spo2);
+        spo2Chart.update();
+    });
 }
