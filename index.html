@@ -1,139 +1,66 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>Patient SpO2 Monitor</title>
+  <title>Patient Monitor</title>
 
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
-<script>
-  var firebaseConfig = {
-    databaseURL: "https://health-monitor-58970-default-rtdb.firebaseio.com/"
-  };
-  firebase.initializeApp(firebaseConfig);
-
-  var dbRef = firebase.database().ref("patient");
-
-  dbRef.on("value", function(snapshot) {
-    document.getElementById("spo2").innerText =
-      snapshot.val().spo2;
-  });
-</script>
-
-<style>
-body {
-  font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #1d2671, #c33764);
-  color: white;
-  text-align: center;
-  margin: 0;
-  padding: 0;
-}
-
-.container {
-  max-width: 600px;
-  margin: auto;
-  padding: 20px;
-}
-
-.card {
-  background: rgba(255,255,255,0.1);
-  border-radius: 15px;
-  padding: 20px;
-  margin-top: 20px;
-}
-
-h1 {
-  margin-top: 20px;
-}
-
-.value {
-  font-size: 48px;
-  font-weight: bold;
-}
-</style>
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+      transition: background 0.5s;
+    }
+    h1 { margin-top: 20px; }
+    canvas { max-width: 90%; }
+  </style>
 </head>
 
 <body>
-
-<div class="container">
-  <h1>Live Patient SpO₂ Monitor</h1>
-
-  <div class="card">
-    <h2>SpO₂ Level</h2>
-    <div class="value" id="spo2">-- %</div>
-  </div>
-
-  <div class="card">
-    <canvas id="spo2Chart"></canvas>
-  </div>
-</div>
+<h1>Live Patient SpO₂ Monitor</h1>
+<h2 id="spo2">-- %</h2>
+<canvas id="chart"></canvas>
 
 <script>
-/* 🔥 FIREBASE CONFIG */
-var firebaseConfig = {
-  apiKey: "AIzaSyCq4-w3QU9AWdu97W3moKyih6ANCN0mFxE",
-  authDomain: "health-monitor-58970.firebaseapp.com",
-  databaseURL: "https://health-monitor-58970-default-rtdb.firebaseio.com",
-  projectId: "health-monitor-58970",
-  storageBucket: "health-monitor-58970.firebasestorage.app",
-  messagingSenderId: "389520868404",
-  appId: "1:389520868404:web:e2e915837835454825f661",
-  measurementId: "G-P2ZDW69QXQ"
-};
+  // Firebase config
+  var firebaseConfig = {
+    apiKey: "AIzaSyCq4-w3QU9AWdu97W3moKyih6ANCN0mFxE",
+    databaseURL: "https://health-monitor-58970-default-rtdb.firebaseio.com/",
+    projectId: "health-monitor-58970"
+  };
+  firebase.initializeApp(firebaseConfig);
 
-firebase.initializeApp(firebaseConfig);
-var database = firebase.database();
+  var ctx = document.getElementById('chart').getContext('2d');
+  var dataPoints = [];
 
-/* 📊 CHART SETUP */
-const ctx = document.getElementById('spo2Chart').getContext('2d');
-const spo2Chart = new Chart(ctx, {
-  type: 'line',
-  data: {
-    labels: [],
-    datasets: [{
-      label: 'SpO₂ %',
-      data: [],
-      borderColor: '#00ffcc',
-      fill: false,
-      tension: 0.3
-    }]
-  },
-  options: {
-    responsive: true,
-    scales: {
-      y: {
-        min: 80,
-        max: 100
-      }
+  var chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [{
+        label: 'SpO₂ %',
+        data: dataPoints,
+        borderColor: 'blue',
+        fill: false
+      }]
     }
-  }
-});
+  });
 
-/* 🔄 LIVE DATA FETCH */
-database.ref('/patient/spo2').on('value', (snapshot) => {
-  const spo2 = snapshot.val();
-  if (spo2 !== null) {
-    document.getElementById("spo2").innerText = spo2 + " %";
+  firebase.database().ref("patient/spo2").on("value", snap => {
+    var value = snap.val();
+    document.getElementById("spo2").innerText = value + " %";
 
-    const time = new Date().toLocaleTimeString();
-    spo2Chart.data.labels.push(time);
-    spo2Chart.data.datasets[0].data.push(spo2);
+    dataPoints.push(value);
+    if (dataPoints.length > 20) dataPoints.shift();
+    chart.update();
 
-    if (spo2Chart.data.labels.length > 10) {
-      spo2Chart.data.labels.shift();
-      spo2Chart.data.datasets[0].data.shift();
-    }
-
-    spo2Chart.update();
-  }
-});
+    document.body.style.background =
+      value < 94 ? "#ffcccc" :
+      value < 97 ? "#fff3cd" :
+      "#d4edda";
+  });
 </script>
-
 </body>
 </html>
