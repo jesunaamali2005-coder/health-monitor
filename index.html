@@ -7,9 +7,23 @@
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<!-- Firebase v8 -->
+
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+<script>
+  var firebaseConfig = {
+    databaseURL: "https://health-monitor-58970-default-rtdb.firebaseio.com/"
+  };
+  firebase.initializeApp(firebaseConfig);
+
+  var dbRef = firebase.database().ref("patient");
+
+  dbRef.on("value", function(snapshot) {
+    document.getElementById("spo2").innerText =
+      snapshot.val().spo2;
+  });
+</script>
 
 <style>
 body {
